@@ -21,7 +21,7 @@ class Ecp_Gateway_Module_Payment_Page extends Ecp_Gateway_Registry
      * @var string
      * @since 2.0.0
      */
-    const PROTOCOL = 'https';
+    const PROTOCOL = 'http';
 
     /**
      * <h2>ECOMMPAY Payment Page URL host name.</h2>
@@ -30,7 +30,7 @@ class Ecp_Gateway_Module_Payment_Page extends Ecp_Gateway_Registry
      * @var string
      * @since 2.0.0
      */
-    const HOST = 'paymentpage.ecommpay.com';
+    const HOST = 'paymentpage.ecommpay.test';
 
     // endregion
 
@@ -61,7 +61,7 @@ class Ecp_Gateway_Module_Payment_Page extends Ecp_Gateway_Registry
      */
     protected function init()
     {
-        $this->endpoint = sprintf('%s://%s', $this->get_protocol(), $this->get_host());
+        $this->generate_endpoint();
 
         // register hooks for AJAX requests
         add_action('wp_ajax_ecommpay_process', [$this, 'ajax_process']); // Authorised user
@@ -81,10 +81,18 @@ class Ecp_Gateway_Module_Payment_Page extends Ecp_Gateway_Registry
         // register hooks for display payment form on payment page
         add_action('before_woocommerce_pay', [$this, 'include_frontend_scripts']);
 
+        // register hooks for display payment form on block-based checkout page
+        add_action('woocommerce_blocks_enqueue_checkout_block_scripts_before', [$this, 'include_new_checkout_scripts']);
+
         // register hooks for additional container on checkout pages
         add_filter('the_content', [$this, 'append_iframe_container'], 10, 1);
 
         add_action('wp_head', [$this, 'wc_custom_redirect_after_purchase']);
+    }
+
+    protected function generate_endpoint()
+    {
+        $this->endpoint = sprintf('%s://%s', $this->get_protocol(), $this->get_host());
     }
 
     /**
@@ -159,6 +167,10 @@ class Ecp_Gateway_Module_Payment_Page extends Ecp_Gateway_Registry
     {
         global $wp;
 
+        if (empty($this->endpoint)) {
+            $this->generate_endpoint();
+        }
+
         try {
             if (isset($wp->query_vars['order-pay']) && absint($wp->query_vars['order-pay']) > 0) {
                 $order_id = absint($wp->query_vars['order-pay']); // The order ID
@@ -198,6 +210,12 @@ class Ecp_Gateway_Module_Payment_Page extends Ecp_Gateway_Registry
             ['jquery'],
             ecp_version()
         );
+
+        $gateways = (new WC_Payment_Gateways())->get_available_payment_gateways();
+        $filtered_gateways = array_keys(array_filter($gateways, function($gateway) {
+            return strpos($gateway->id, 'ecommpay-') === 0 && $gateway->enabled === "yes";
+        }));
+
         wp_localize_script(
             'ecommpay_checkout_script',
             'ECP',
@@ -205,10 +223,35 @@ class Ecp_Gateway_Module_Payment_Page extends Ecp_Gateway_Registry
                 'ajax_url' => admin_url("admin-ajax.php"),
                 'origin_url' => $url,
                 'order_id' => $order_id,
+                'gateways' => $filtered_gateways,
             ]
         );
 
         wp_enqueue_style('ecommpay_loader_css', ecp_css_url('loader.css'));
+    }
+
+    public function include_new_checkout_scripts()
+    {
+        $this->include_frontend_scripts();
+
+        $script_name = 'wc-ecommpay-blocks-integration';
+		wp_register_script(
+			$script_name,
+			plugins_url( 'build/index.js', ECP_PLUGIN_PATH ),
+			[
+				'wc-blocks-registry',
+				'wc-settings',
+				'wp-element',
+				'wp-html-entities',
+				'wp-i18n',
+			],
+			ecp_version(),
+			true
+		);
+        if( function_exists( 'wp_set_script_translations' ) ) {
+			wp_set_script_translations( $script_name );
+		}
+        wp_enqueue_script($script_name);
     }
 
     /**
@@ -235,12 +278,13 @@ class Ecp_Gateway_Module_Payment_Page extends Ecp_Gateway_Registry
      *
      * @param Ecp_Gateway_Order $order <p>Order object.</p>
      * @since 2.0.0
-     * @return array <p>Form data as key-value array.</p>
+     * @return string <p>URL to payment page.</p>
      * </p>
      */
     public function get_request_url($order, $gateway)
     {
-        return apply_filters('ecp_append_signature', $this->get_form_data($order, $gateway));
+        $query_params = apply_filters('ecp_append_signature', $this->get_form_data($order, $gateway));
+        return $this->endpoint . '/payment?' . http_build_query($query_params);
     }
 
     /**

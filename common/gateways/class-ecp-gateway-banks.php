@@ -60,7 +60,8 @@ class Ecp_Gateway_Banks extends Ecp_Gateway
     public function __construct()
     {
         $this->id = Ecp_Gateway_Settings_Banks::ID;
-        $this->method_title = __('ECOMMPAY Open banking', 'woo-ecommpay');
+        $this->method_title = __('ECOMMPAY', 'woo-ecommpay');
+        $this->method_description = __('Accept payments via Open Banking.', 'woo-ecommpay');
         $this->has_fields = false;
         $this->title = $this->get_option(Ecp_Gateway_Settings::OPTION_TITLE);
         $this->order_button_text = $this->get_option(Ecp_Gateway_Settings::OPTION_CHECKOUT_BUTTON_TEXT);
@@ -72,27 +73,6 @@ class Ecp_Gateway_Banks extends Ecp_Gateway
         }
 
         parent::__construct();
-    }
-
-    /**
-     * @inheritDoc
-     * @override
-     * @return string
-     * @since 3.0.0
-     */
-    public function get_method_description()
-    {
-        $query_string = http_build_query([
-            'page' => 'wc-settings',
-            'tab' => 'checkout',
-            'section' => $this->id,
-            'sub' => 'general'
-        ]);
-
-        $url = esc_url_raw(admin_url( 'admin.php?' . $query_string, dirname( __FILE__ )));
-        $this->method_description = __('Accept payments via Open Banking.', 'woo-ecommpay')
-            . sprintf(' <a href="%s">%s</a>.', $url, __('General settings'));
-        return parent::get_method_description();
     }
 
     /**

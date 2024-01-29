@@ -39,7 +39,7 @@ class Ecp_Gateway_Array implements ArrayAccess, Countable
      * @since 2.0.0
      * @return bool <p><b>TRUE</b> if offset exists or <b>FALSE</b> otherwise.</p>
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->array);
     }
@@ -49,7 +49,7 @@ class Ecp_Gateway_Array implements ArrayAccess, Countable
      * @since 2.0.0
      * @return mixed <p>Array offset value.</p>
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->array[$offset];
     }
@@ -59,7 +59,7 @@ class Ecp_Gateway_Array implements ArrayAccess, Countable
      * @since 2.0.0
      * @return void
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (null === $offset) {
             $this->array[] = $value;
@@ -73,7 +73,7 @@ class Ecp_Gateway_Array implements ArrayAccess, Countable
      * @since 2.0.0
      * @return void
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->array[$offset]);
     }
@@ -87,7 +87,7 @@ class Ecp_Gateway_Array implements ArrayAccess, Countable
      * @since 2.0.0
      * @return int <p>The number of elements in the array.</p>
      */
-    public function count()
+    public function count(): int
     {
         return count($this->array);
     }

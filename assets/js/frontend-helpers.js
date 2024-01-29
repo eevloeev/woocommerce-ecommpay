@@ -5,6 +5,10 @@ jQuery(document).ready(function () {
      */
     var $paymentMethodsWrapper = document.querySelector('#order_review.woocommerce-checkout-review-order');
 
+    if (!$paymentMethodsWrapper) {
+        return;
+    }
+
     /**
      * Check the availability of Apple Pay to make a payment.
      */

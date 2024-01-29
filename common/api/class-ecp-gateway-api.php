@@ -28,7 +28,7 @@ class Ecp_Gateway_API
      * @var string
      * @since 2.0.0
      */
-    const HOST = 'api.ecommpay.com';
+    const HOST = 'gate.ecommpay.test';
 
     /**
      * <h2>Default API protocol version.</h2>

@@ -126,20 +126,7 @@ function ecp_callback_url($post_id = null)
  */
 function ecp_get_order($the_order = false)
 {
-    add_filter(
-        'woocommerce_order_class',
-        [ecommpay(), 'type_wrapper'],
-        100,
-        2
-    );
-
-    $order = wc_get_order($the_order);
-
-    remove_filter(
-        'woocommerce_order_class',
-        [ecommpay(), 'type_wrapper'],
-        100
-    );
+    $order = new Ecp_Gateway_Order($the_order);
 
     /** @noinspection PhpIncompatibleReturnTypeInspection */
     return $order;

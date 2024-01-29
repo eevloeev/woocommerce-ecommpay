@@ -22,6 +22,8 @@ if (!defined('ECP_PLUGIN_PATH')) {
     define( 'ECP_PLUGIN_PATH', __FILE__ );
 }
 
+require_once __DIR__ . '/helpers/ecp-woo-blocks-support.php';
+
 add_action(
     'plugins_loaded',
     function () {

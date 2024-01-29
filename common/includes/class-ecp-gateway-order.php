@@ -61,7 +61,7 @@ class Ecp_Gateway_Order extends \Automattic\WooCommerce\Admin\Overrides\Order
         $test_mode = ecp_is_enabled(Ecp_Gateway_Settings_General::OPTION_TEST);
         
         $_payment_id = get_post_meta($this->get_id(), '_payment_id', true);
-        if ($_payment_id!='' & ($_REQUEST['action']!='ecommpay_process')){
+        if ($_payment_id!='' & (isset($_REQUEST['action']) && $_REQUEST['action']!='ecommpay_process')){
             $id = $_payment_id;
         } else if (!empty($_REQUEST['payment_id'])) {
             $id = $_REQUEST['payment_id'];

@@ -317,7 +317,7 @@ class Ecp_Form extends Ecp_Gateway_Registry
         }
 
         $key = $value[Ecp_Gateway_Settings::FIELD_ID];
-        $default = $value[Ecp_Gateway_Settings::FIELD_DEFAULT];
+        $default = $value[Ecp_Gateway_Settings::FIELD_DEFAULT] ?? null;
 
         if (empty($this->settings)) {
             $this->init_settings();
@@ -332,7 +332,7 @@ class Ecp_Form extends Ecp_Gateway_Registry
             $this->settings[$method][$key] = $default;
         }
 
-        return $this->settings[$method][$key];
+        return $this->settings[$method][$key] ?? '';
     }
 
     /**

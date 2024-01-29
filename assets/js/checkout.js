@@ -231,23 +231,7 @@ jQuery(document).ready(function () {
     }
 
     function redirect(url) {
-        let form = jQuery('<form/>', {
-            method: 'post',
-            action: url.baseUrl + '/payment',
-            style: {
-                display: 'none',
-            }
-        });
-
-        jQuery.each(url, function (key, value) {
-            form.append(jQuery('<input/>', {
-                type: 'hidden',
-                name: key,
-                value: value
-            }));
-        });
-
-        jQuery(form).appendTo('body').submit();
+        window.location.href = url;
     }
 
     /* Embedded iFrame flow */

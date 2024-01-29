@@ -286,7 +286,7 @@ class Ecp_Gateway_Json extends Ecp_Gateway_Array implements JsonSerializable
      * @since 2.0.0
      * @return array <p>Prepared array for {@see json_encode}.</p>
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $result = [];
 
